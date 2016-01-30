@@ -9,6 +9,36 @@
     "resources": {
         "media": [
             {
+                "file": "images/supersweet.png",
+                "name": "VERYGOOD",
+                "targetPlatforms": null,
+                "type": "png"
+            },
+            {
+                "file": "images/sucked.png",
+                "name": "VERYBAD",
+                "targetPlatforms": null,
+                "type": "png"
+            },
+            {
+                "file": "images/notgood.png",
+                "name": "BAD",
+                "targetPlatforms": null,
+                "type": "png"
+            },
+            {
+                "file": "images/butjustok.png",
+                "name": "MED",
+                "targetPlatforms": null,
+                "type": "png"
+            },
+            {
+                "file": "images/itwasok.png",
+                "name": "GOOD",
+                "targetPlatforms": null,
+                "type": "png"
+            },
+            {
                 "file": "images/example1.png",
                 "name": "EXAMPLE1",
                 "targetPlatforms": null,

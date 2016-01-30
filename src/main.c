@@ -155,11 +155,11 @@ static void menu_select_callback(MenuLayer *menu_layer, MenuIndex *cell_index, v
 //Loads main_window
 static void main_window_load(Window *window) {
   // Here we load the bitmap assets
-  s_menu_icons[0] = gbitmap_create_with_resource(RESOURCE_ID_EXAMPLE1);
-  s_menu_icons[1] = gbitmap_create_with_resource(RESOURCE_ID_EXAMPLE1);
-  s_menu_icons[2] = gbitmap_create_with_resource(RESOURCE_ID_EXAMPLE1);
-  s_menu_icons[3] = gbitmap_create_with_resource(RESOURCE_ID_EXAMPLE1);
-  s_menu_icons[4] = gbitmap_create_with_resource(RESOURCE_ID_EXAMPLE1);
+  s_menu_icons[0] = gbitmap_create_with_resource(RESOURCE_ID_VERYGOOD);
+  s_menu_icons[1] = gbitmap_create_with_resource(RESOURCE_ID_GOOD);
+  s_menu_icons[2] = gbitmap_create_with_resource(RESOURCE_ID_MED);
+  s_menu_icons[3] = gbitmap_create_with_resource(RESOURCE_ID_BAD);
+  s_menu_icons[4] = gbitmap_create_with_resource(RESOURCE_ID_VERYBAD);
   s_menu_icons[5] = gbitmap_create_with_resource(RESOURCE_ID_EXAMPLE1);
 
 
