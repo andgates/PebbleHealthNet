@@ -27,12 +27,6 @@
                 "type": "png"
             },
             {
-                "file": "images/butjustok.png",
-                "name": "MED",
-                "targetPlatforms": null,
-                "type": "png"
-            },
-            {
                 "file": "images/itwasok.png",
                 "name": "GOOD",
                 "targetPlatforms": null,
@@ -41,6 +35,12 @@
             {
                 "file": "images/example1.png",
                 "name": "EXAMPLE1",
+                "targetPlatforms": null,
+                "type": "png"
+            },
+            {
+                "file": "images/butjustok.png",
+                "name": "MED",
                 "targetPlatforms": null,
                 "type": "png"
             }

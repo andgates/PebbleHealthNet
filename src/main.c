@@ -10,13 +10,14 @@ static Window *s_main_window,                              //Window where user r
               *s_thanks_window;                            //Thank-you window
 
 static TextLayer *s_sleep_text_layer,                      //Text that says how many hours user slept
-                 *s_thanks_text_layer;                     //Thanks user for rating their sleep
+                 *s_thanks_text_layer,                      //Thanks user for rating their sleep
+                 *z1;
 
 static MenuLayer *s_menu_layer;                            //Menu where user rates their sleep
                                                            //(used in s_main_window)
 
-static GBitmap *s_menu_icons[NUM_MENU_ICONS],              //Images corresponding to menu choices     
-               *s_sleep_image;                             //Image corresponding to sleep image(not uploaded)
+static GBitmap *s_menu_icons[NUM_MENU_ICONS];              //Images corresponding to menu choices     
+
 
 int rating = 0;                                            //Sleep rating that can be stored
 /****************************************************************************************************/
@@ -217,23 +218,37 @@ static void intro_window_load(Window *window) {
   snprintf(hoursSlept, sizeof(hoursSlept), "You slept for %d hours", 0);
   
   //Sets size of sleep text
-  s_sleep_text_layer = text_layer_create(GRect(0, 72, bounds.size.w, 20));
+  s_sleep_text_layer = text_layer_create(GRect(0, 0, bounds.size.w, 200));
   //adds text to sleep_text
   text_layer_set_text(s_sleep_text_layer, hoursSlept);
   //sets background color to cyan
   text_layer_set_background_color(s_sleep_text_layer, GColorCyan);
   //sets font color to yellow
-  text_layer_set_text_color(s_sleep_text_layer, GColorYellow);
+  text_layer_set_text_color(s_sleep_text_layer, GColorPurple);
+  
+  //text_layer_set_size(s_sleep_text_layer, 18);
+  text_layer_set_font(s_sleep_text_layer, fonts_get_system_font(FONT_KEY_DROID_SERIF_28_BOLD));
+  
   //centers text
   text_layer_set_text_alignment(s_sleep_text_layer, GTextAlignmentCenter);
   //don't know what this does, think we need it though
   layer_add_child(window_layer, text_layer_get_layer(s_sleep_text_layer));
   
+  z1 = text_layer_create(GRect(10, 145, bounds.size.w, 20));
+  text_layer_set_text(z1, "Zzz");
+  text_layer_set_text_alignment(z1, GTextAlignmentLeft);
+  text_layer_set_font(z1, fonts_get_system_font(FONT_KEY_GOTHIC_18_BOLD));
+  text_layer_set_background_color(z1, GColorCyan);
+  layer_add_child(window_layer, text_layer_get_layer(z1));
+
+
 }
 
 //Unloads intro_window
 static void intro_window_unload(Window *window) {
   text_layer_destroy(s_sleep_text_layer);
+  text_layer_destroy(z1);
+
 }
 /******************************************************************************************************/
 
@@ -252,15 +267,17 @@ static void thanks_window_load(Window *window) {
   snprintf(userRating, sizeof(userRating), "You rated %d ", rating);
   
   //sets size of thanks_text
-  s_thanks_text_layer = text_layer_create(GRect(0, 72, bounds.size.w, 20));
+  s_thanks_text_layer = text_layer_create(GRect(0, 0, bounds.size.w, 200));
   //adds text to thanks_text
   text_layer_set_text(s_thanks_text_layer, userRating);
   //sets background color to cyan
   text_layer_set_background_color(s_thanks_text_layer, GColorCyan);
   //sets text color to yellow
-  text_layer_set_text_color(s_thanks_text_layer, GColorYellow);
+  text_layer_set_text_color(s_thanks_text_layer, GColorPurple);
   //centers text
   text_layer_set_text_alignment(s_thanks_text_layer, GTextAlignmentCenter);
+  
+  text_layer_set_font(s_thanks_text_layer, fonts_get_system_font(FONT_KEY_DROID_SERIF_28_BOLD));
   //dont know, think its important
   layer_add_child(window_layer, text_layer_get_layer(s_thanks_text_layer));
   
