@@ -2,16 +2,24 @@
 
 #define NUM_MENU_ICONS 6
 #define NUM_FIRST_MENU_ITEMS 6
+#define FIVE = 5
 
 
 /****************************Global Variable Declarations*******************************************/
 static Window *s_main_window,                              //Window where user rates their sleep
               *s_intro_window,                             //Intro Window
-              *s_thanks_window;                            //Thank-you window
+              *s_thanks_window,                            //Thank-you window
+              *s_last5_window;
 
 static TextLayer *s_sleep_text_layer,                      //Text that says how many hours user slept
                  *s_thanks_text_layer,                      //Thanks user for rating their sleep
-                 *z1;
+                 *z1,
+                 *s_last5_text_layer0,
+                 *s_last5_text_layer1,
+                 *s_last5_text_layer2,
+                 *s_last5_text_layer3,
+                 *s_last5_text_layer4,
+                 *s_mid[4];
 
 static MenuLayer *s_menu_layer;                            //Menu where user rates their sleep
                                                            //(used in s_main_window)
@@ -20,6 +28,14 @@ static GBitmap *s_menu_icons[NUM_MENU_ICONS];              //Images correspondin
 
 
 int rating = 0;                                            //Sleep rating that can be stored
+
+//for testing
+struct sleepMood {
+  int mood;
+  int hours;
+};
+
+ struct sleepMood a[5];
 /****************************************************************************************************/
 
 /*****************************Number returning Functions*********************************************/
@@ -75,13 +91,17 @@ static void back_click_config_provider(void *context){
 }
 //Recognizers when user clicks anything on s_thanks_window
 static void thanks_click_handler(ClickRecognizerRef recognizer, void *context) {
-  window_stack_pop_all(true);    //After providing input, exits app
+  //window_stack_pop_all(true);    //After providing input, exits app
+  window_stack_push(s_last5_window, true);
 }
 //Config for clicking anything on s_thanks_window
 static void thanks_click_config_provider(void *context){
-  window_single_click_subscribe(BUTTON_ID_BACK, thanks_click_handler);
+  window_single_click_subscribe(BUTTON_ID_BACK, back_handler);
+  //Continue
   window_single_click_subscribe(BUTTON_ID_UP, thanks_click_handler);
-  window_single_click_subscribe(BUTTON_ID_DOWN, thanks_click_handler);
+  //Exit
+  window_single_click_subscribe(BUTTON_ID_DOWN, back_handler);
+  //continue
   window_single_click_subscribe(BUTTON_ID_SELECT, thanks_click_handler);
   
 }
@@ -289,6 +309,101 @@ static void thanks_window_unload(Window *window) {
 }
 /******************************************************************************************************/
 
+/************************************ur face*****************************************************/
+//Loads thanks window
+static void last5_window_load(Window *window) {
+  // Now we prepare to initialize the thank you
+  Layer *window_layer = window_get_root_layer(window);
+  GRect bounds = layer_get_bounds(window_layer);
+  
+  //if user presses BACK, the app exits
+  //window_set_click_config_provider(window, thanks_click_config_provider);
+  
+  
+  for(int i = 0; i < 5; i++){
+    a[i].mood = (rand() % (5 + 1 - 1) + 1);
+    a[i].hours = (rand() % (24 + 1 - 0) + 0);
+  }
+  static char day1[32];
+  snprintf(day1, sizeof(day1),"Mood: %d, Hours Slept: %d", a[0].mood, a[0].hours);
+  static char day2[32];
+  snprintf(day2, sizeof(day2),"Mood: %d, Hours Slept: %d", a[1].mood, a[1].hours);
+  static char day3[32];
+  snprintf(day3, sizeof(day3),"Mood: %d, Hours Slept: %d", a[2].mood, a[2].hours);
+  static char day4[32];
+  snprintf(day4, sizeof(day4),"Mood: %d, Hours Slept: %d", a[3].mood, a[3].hours);
+  static char day5[32];
+  snprintf(day5, sizeof(day5),"Mood: %d, Hours Slept: %d", a[4].mood, a[4].hours);
+  
+  
+  
+  
+  
+//   //converts user rating to char **FOR TESTING**
+//   static char userRating[32];  
+//   snprintf(userRating, sizeof(userRating), "You rated %d ", rating);
+  
+  //sets size of last5
+  s_last5_text_layer0 = text_layer_create(GRect(0, 0, bounds.size.w, 34));
+  s_mid[0] = text_layer_create(GRect(0, 33, bounds.size.w, 1));
+  s_last5_text_layer1 = text_layer_create(GRect(0, 34, bounds.size.w, 34));
+  s_mid[1] = text_layer_create(GRect(0, 67, bounds.size.w, 1));
+  s_last5_text_layer2 = text_layer_create(GRect(0, 68, bounds.size.w, 34));
+  s_mid[2] = text_layer_create(GRect(0, 101, bounds.size.w, 1));
+  s_last5_text_layer3 = text_layer_create(GRect(0, 102, bounds.size.w, 34));
+  s_mid[3] = text_layer_create(GRect(0, 135, bounds.size.w, 1));
+  s_last5_text_layer4 = text_layer_create(GRect(0, 136, bounds.size.w, 34));
+  
+  
+  //adds text to last5
+  text_layer_set_text(s_last5_text_layer0, day1);
+  text_layer_set_text(s_last5_text_layer1, day2);
+  text_layer_set_text(s_last5_text_layer2, day3);
+  text_layer_set_text(s_last5_text_layer3, day4);
+  text_layer_set_text(s_last5_text_layer4, day5);
+ 
+  //sets background color to cyan
+  text_layer_set_background_color(s_last5_text_layer0, GColorRed);
+  text_layer_set_background_color(s_last5_text_layer1, GColorOrange);
+  text_layer_set_background_color(s_last5_text_layer2, GColorYellow);
+  text_layer_set_background_color(s_last5_text_layer3, GColorGreen);
+  text_layer_set_background_color(s_last5_text_layer4, GColorBlue);
+  for(int i = 0; i < 4; i++){
+  text_layer_set_background_color(s_mid[i], GColorBlack);
+  }
+
+  //centers text
+  text_layer_set_text_alignment(s_last5_text_layer0, GTextAlignmentLeft);
+  text_layer_set_text_alignment(s_last5_text_layer1, GTextAlignmentLeft);
+  text_layer_set_text_alignment(s_last5_text_layer2, GTextAlignmentLeft);
+  text_layer_set_text_alignment(s_last5_text_layer3, GTextAlignmentLeft);
+  text_layer_set_text_alignment(s_last5_text_layer4, GTextAlignmentLeft);  
+
+  //dont know, think its important
+  layer_add_child(window_layer, text_layer_get_layer(s_last5_text_layer0));
+  layer_add_child(window_layer, text_layer_get_layer(s_last5_text_layer1));  
+  layer_add_child(window_layer, text_layer_get_layer(s_last5_text_layer2)); 
+  layer_add_child(window_layer, text_layer_get_layer(s_last5_text_layer3)); 
+  layer_add_child(window_layer, text_layer_get_layer(s_last5_text_layer4));
+  for(int i = 0; i < 4; i++){
+  layer_add_child(window_layer, text_layer_get_layer(s_mid[i]));
+  }
+}
+
+//Unloads last5 window
+static void last5_window_unload(Window *window) {
+    text_layer_destroy(s_last5_text_layer0);
+    text_layer_destroy(s_last5_text_layer1);
+    text_layer_destroy(s_last5_text_layer2);
+    text_layer_destroy(s_last5_text_layer3);
+    text_layer_destroy(s_last5_text_layer4);
+  for(int i = 0; i < 4; i++){
+    text_layer_destroy(s_mid[i]);
+  }
+}
+
+/******************************************************************************************************/
+
 
 /****************Initialization, Deinitialization, and Main********************************************/
 static void init() {
@@ -313,6 +428,12 @@ static void init() {
   window_set_window_handlers(s_thanks_window, (WindowHandlers) {
     .load = thanks_window_load,
     .unload = thanks_window_unload,
+  });
+  //creates last5 window
+  s_last5_window = window_create();
+  window_set_window_handlers(s_last5_window, (WindowHandlers) {
+    .load = last5_window_load,
+    .unload = last5_window_unload,
   });
   //window_stack_push(s_main_window, true);
   window_stack_push(s_intro_window, true);
