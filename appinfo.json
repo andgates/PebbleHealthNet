@@ -1,19 +1,26 @@
 {
-  "uuid": "ab2a91c2-4cab-44a8-ac8c-c5ba03b55897",
-  "shortName": "hello-pebble",
-  "longName": "hello-pebble",
-  "companyName": "MakeAwesomeHappen",
-  "versionLabel": "1.0",
-  "sdkVersion": "3",
-  "targetPlatforms": ["aplite", "basalt", "chalk"],
-  "watchapp": {
-    "watchface": false
-  },
-  "appKeys": {
-    "dummy": 0
-  },
-  "resources": {
-    "media": []
-  },
-  "capabilities": [ "health" ]
+    "appKeys": {},
+    "capabilities": [
+        ""
+    ],
+    "companyName": "hi.imsean@yahoo.com",
+    "longName": "HealthNET",
+    "projectType": "native",
+    "resources": {
+        "media": [
+            {
+                "file": "images/example1.png",
+                "name": "EXAMPLE1",
+                "targetPlatforms": null,
+                "type": "png"
+            }
+        ]
+    },
+    "sdkVersion": "3",
+    "shortName": "HealthNET",
+    "uuid": "7273f7b5-887d-41ee-a319-66d604447314",
+    "versionLabel": "1.0",
+    "watchapp": {
+        "watchface": false
+    }
 }
