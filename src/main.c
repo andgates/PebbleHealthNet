@@ -448,7 +448,7 @@ static void intro_window_load(Window *window) {
 
   //Converts hours slept into a string
   static char hoursSlept[32];
-  snprintf(hoursSlept, sizeof(hoursSlept), "You slept for %d hours", 0);
+  snprintf(hoursSlept, sizeof(hoursSlept), "You slept for %d hours", (today.sleepSeconds + 1800)/3600);
 
   //Sets size of sleep text
   s_sleep_text_layer = text_layer_create(GRect(0, 40, bounds.size.w, 200));
@@ -522,7 +522,7 @@ static void thanks_window_load(Window *window) {
     snprintf(userRating, sizeof(userRating), "You rated n/a ");
   else
     snprintf(userRating, sizeof(userRating), "You rated %d ", rating);
-  
+
   //sets size of thanks_text
   s_thanks_text_layer = text_layer_create(GRect(0, 40, bounds.size.w, 200));
   s_mid[0] = text_layer_create(GRect(0, 33, bounds.size.w, 1));
@@ -632,7 +632,7 @@ static void graph_window_load(Window *window) {
  }
  blue_bar = text_layer_create(GRect(0,140, bounds.size.w, 40));
  white_bar = text_layer_create(GRect(0, 4, bounds.size.w, 26));
-  text_layer_set_text(white_bar, sleep / activity);
+  text_layer_set_text(white_bar, "sleep / activity");
   text_layer_set_background_color(white_bar, GColorWhite);
   text_layer_set_text_alignment(white_bar, GTextAlignmentCenter);
 
