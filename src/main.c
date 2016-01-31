@@ -83,9 +83,21 @@ static void getDate(char* buf){
     time(&now);
     ////// Format time, "ddd yyyy-mm-dd hh:mm:ss zzz"
     ts = *localtime(&now);
-    strftime(buf, sizeof(buf), "%m-%d-%Y\n", &ts);
+    strftime(buf, sizeof(buf), "%m-%d-%Y", &ts);
     APP_LOG(APP_LOG_LEVEL_INFO, "Got Date: %s", buf);
     //return *buf;
+}
+
+static void getDayName(char buf[4][4], time_t time){
+    //time_t now;
+    struct tm ts;
+    //char buf[11];
+    ////// Get current time
+    //time(&time);
+    ////// Format time, "ddd yyyy-mm-dd hh:mm:ss zzz"
+    ts = *localtime(&time);
+    strftime(buf[0], sizeof(buf[0]), "%a", &ts);
+    //APP_LOG(APP_LOG_LEVEL_INFO, "Got Date: %s", buf);
 }
 
 static int getCurrentDayNumber(){
@@ -364,7 +376,7 @@ static void intro_window_load(Window *window) {
   s_mid[0] = text_layer_create(GRect(0, 33, bounds.size.w, 1));
   s_last5_text_layer[0] = text_layer_create(GRect(0, 0, bounds.size.w, 40));
   //adds text to sleep_text
-  char date1[25];
+  static char date1[25];
       time_t now;
     struct tm ts;
     //char buf[11];
@@ -372,7 +384,7 @@ static void intro_window_load(Window *window) {
     time(&now);
     ////// Format time, "ddd yyyy-mm-dd hh:mm:ss zzz"
     ts = *localtime(&now);
-    strftime(date1, sizeof(date1), "%m-%d-%Y", &ts);
+    strftime(date1, sizeof(date1), "%m/%d/%Y", &ts);
     APP_LOG(APP_LOG_LEVEL_INFO, "Got Date: %s", date1);
   text_layer_set_text(s_sleep_text_layer, hoursSlept);
   text_layer_set_text(s_last5_text_layer[0], date1);
@@ -434,7 +446,7 @@ static void thanks_window_load(Window *window) {
   s_mid[0] = text_layer_create(GRect(0, 33, bounds.size.w, 1));
   s_last5_text_layer[0] = text_layer_create(GRect(0, 0, bounds.size.w, 40));
   //adds text to thanks_text
-  char date[25];
+  static char date[25];
       time_t now;
     struct tm ts;
     //char buf[11];
@@ -442,7 +454,7 @@ static void thanks_window_load(Window *window) {
     time(&now);
     ////// Format time, "ddd yyyy-mm-dd hh:mm:ss zzz"
     ts = *localtime(&now);
-    strftime(date, sizeof(date), "%m%d/%Y", &ts);
+    strftime(date, sizeof(date), "%m/%d/%Y", &ts);
     APP_LOG(APP_LOG_LEVEL_INFO, "Got Date: %s", date);
   text_layer_set_text(s_thanks_text_layer, userRating);
   text_layer_set_text(s_last5_text_layer[0], date);
@@ -524,6 +536,11 @@ static void last5_window_unload(Window *window) {
 static void init() {
     loadDemoData();
     getHealthData();
+    char day[4][4];
+    time_t now;
+    time(&now);
+    getDayName(day, now);
+    APP_LOG(APP_LOG_LEVEL_INFO, "Got Day Name: %s", day[0]);
   //Creates intro window
   s_intro_window = window_create();
   window_set_window_handlers(s_intro_window, (WindowHandlers){
