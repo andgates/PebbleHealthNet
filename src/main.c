@@ -3,19 +3,26 @@
 
 #define NUM_MENU_ICONS 6
 #define NUM_FIRST_MENU_ITEMS 6
-#define FIVE = 5
+#define FIVE 7
+#define WATCH_WIDTH 144
+#define WATCH_LENGTH 168
 
 /****************************Global Variable Declarations*******************************************/
 static Window *s_main_window,                              //Window where user rates their sleep
               *s_intro_window,                             //Intro Window
               *s_thanks_window,                            //Thank-you window
-              *s_last5_window;
+              *s_last5_window,
+              *s_graph_window;
 
 static TextLayer *s_sleep_text_layer,                      //Text that says how many hours user slept
                  *s_thanks_text_layer,                      //Thanks user for rating their sleep
                  *z1,
                  *s_last5_text_layer[5],
-                 *s_mid[5];
+                 *s_mid[5],
+                 *s_graph_layer,
+                 *daysSleep[4],
+                 *daysSteps[4],
+                 *blue_bar;
 
 static MenuLayer *s_menu_layer;                            //Menu where user rates their sleep
                                                            //(used in s_main_window)
@@ -24,6 +31,15 @@ static GBitmap *s_menu_icons[NUM_MENU_ICONS];              //Images correspondin
 
 
 int rating = 0;                                            //Sleep rating that can be stored
+
+enum moods {
+ EXAMPLE1,     //0
+ VERY_UNHAPPY, //1
+ UNHAPPY,      //2
+ MED,          //3
+ HAPPY,        //4
+ VERY_HAPPY    //5
+ };
 
 struct healthData {
 	int mood;
@@ -34,6 +50,45 @@ struct healthData {
 // struct sleepMood a[5];
 struct healthData today;
 struct healthData weekData[5];
+
+int stepsTakenRating(int steps){
+ //function takes the amount of steps taken in a day and
+ //returns an activity level rating (on a scale of 1 to 10)
+ int rating = (steps+300)/600;
+ //if rating == 0
+ return rating > 10 ? 10 : rating;
+}
+
+int sleepRating(int sleepSeconds){
+ //function takes the amount of sleep in a night in seconds and
+ //returns a sleep level rating (on a scale of 1 to 10)
+ int rating = (sleepSeconds+1800)/3600;
+ return rating > 10 ? 10 : rating;
+}
+
+GColor colorSelect(int mood){
+//returns color based on mood.
+//dark green is highest mood, red is lowest, black is n/a.
+ switch(mood){
+ case VERY_HAPPY:
+   return GColorIslamicGreen;
+   break;
+ case HAPPY:
+   return GColorGreen;
+   break;
+ case MED:
+   return GColorChromeYellow;
+   break;
+ case UNHAPPY:
+   return GColorOrange;
+   break;
+ case VERY_UNHAPPY:
+   return GColorDarkCandyAppleRed;
+   break;
+ default:
+   return GColorBlack;
+ }
+}
 
  /****************************Brian/Michael*********************************************************/
 
@@ -185,7 +240,7 @@ static int16_t menu_get_header_height_callback(MenuLayer *menu_layer, uint16_t s
 
 
 
-/******************************************Pebble Round Shit********************************************/
+/******************************************Pebble Round Stuff********************************************/
 #ifdef PBL_ROUND
 static int16_t get_cell_height_callback(MenuLayer *menu_layer, MenuIndex *cell_index, void *callback_context) {
   if (menu_layer_is_index_selected(menu_layer, cell_index)) {
@@ -237,7 +292,30 @@ static void thanks_click_config_provider(void *context){
   window_single_click_subscribe(BUTTON_ID_DOWN, back_handler);
   //continue
   window_single_click_subscribe(BUTTON_ID_SELECT, thanks_click_handler);
-
+}
+static void last5_click_handler(ClickRecognizerRef recognizer, void *context) {
+  window_stack_push(s_graph_window, true);
+}
+static void last_5_click_provider(void *context){
+  window_single_click_subscribe(BUTTON_ID_BACK, back_handler);
+  //Continue
+  window_single_click_subscribe(BUTTON_ID_UP, last5_click_handler);
+  //Exit
+  window_single_click_subscribe(BUTTON_ID_DOWN, last5_click_handler);
+  //continue
+  window_single_click_subscribe(BUTTON_ID_SELECT, last5_click_handler);
+}
+static void graph_click_handler(ClickRecognizerRef recognizer, void *context){
+  window_stack_pop_all(true);
+}
+static void graph_click_provider(void *context){
+  window_single_click_subscribe(BUTTON_ID_BACK, back_handler);
+  //Continue
+  window_single_click_subscribe(BUTTON_ID_UP, graph_click_handler);
+  //Exit
+  window_single_click_subscribe(BUTTON_ID_DOWN, graph_click_handler);
+  //continue
+  window_single_click_subscribe(BUTTON_ID_SELECT, graph_click_handler);
 }
 /******************************************************************************************************/
 
@@ -486,7 +564,7 @@ static void thanks_window_unload(Window *window) {
 }
 /******************************************************************************************************/
 
-/************************************ur face*****************************************************/
+/************************************last5_window*****************************************************/
 //Loads thanks window
 static void last5_window_load(Window *window) {
   // Now we prepare to initialize the thank you
@@ -531,6 +609,59 @@ static void last5_window_unload(Window *window) {
 }
 
 /******************************************************************************************************/
+/*****************************************graph_window*************************************************/
+//Loads window
+static void graph_window_load(Window *window) {
+  Layer *window_layer = window_get_root_layer(window);
+  GRect bounds = layer_get_bounds(window_layer);
+  
+  for (int i = 0; i < 4; i++){
+   daysSleep[i] = text_layer_create(GRect(111-35*i, 140-11*sleepRating(weekData[i].sleepSeconds), 13, sleepRating(weekData[i].sleepSeconds)*11));
+   text_layer_set_background_color(daysSleep[i], colorSelect(weekData[i].mood));
+   daysSteps[i] = text_layer_create(GRect(125-35*i, 140-11*stepsTakenRating(weekData[i].steps), 13, stepsTakenRating(weekData[i].steps)*11));
+   text_layer_set_background_color(daysSteps[i], colorSelect(weekData[i].mood));
+   layer_add_child(window_layer, text_layer_get_layer(daysSleep[i]));
+   layer_add_child(window_layer, text_layer_get_layer(daysSteps[i]));
+ }
+ blue_bar = text_layer_create(GRect(0,140, bounds.size.w, 40));
+ text_layer_set_background_color(blue_bar, GColorBlue);
+ //text_layer = text_layer_create(GRect(50,50, bounds.size.w,40));
+ //text_layer_set_background_color(text_layer, GColorBlack);
+layer_add_child(window_layer, text_layer_get_layer(blue_bar));
+ //text_layer_set_text(blue_bar, "   ZZZ     ZZZ     zzz     ZZZ");
+ 
+ /*printing the string with day names*/
+ //******need a fixed width font
+ char lastFourDayNames[4][4] = {"Sun","Sat","Fri","Thu"};
+ static char lastFourDayNamesString[30];
+ for (int i = 0; i < 3; i++)
+     lastFourDayNamesString[i] = ' ';
+ for (int i = 3; i < 6; i++)
+     lastFourDayNamesString[i] = lastFourDayNames[3][i-3];
+ for (int i = 6; i < 11; i++)
+     lastFourDayNamesString[i] = ' ';
+ for (int i = 11; i < 14; i++)
+     lastFourDayNamesString[i] = lastFourDayNames[2][i-11];
+ for (int i = 14; i < 19; i++)
+     lastFourDayNamesString[i] = ' ';
+ for (int i = 19; i < 22; i++)
+     lastFourDayNamesString[i] = lastFourDayNames[1][i-19];
+ for (int i = 22; i < 26; i++)
+     lastFourDayNamesString[i] = ' ';
+ for (int i = 26; i < 29; i++)
+     lastFourDayNamesString[i] = lastFourDayNames[0][i-26];
+ lastFourDayNamesString[29] = '\0';
+ text_layer_set_text(blue_bar, lastFourDayNamesString);
+}
+
+static void graph_window_unload(Window *window){
+  for (int i = 0; i < 4; i++){
+     text_layer_destroy(daysSleep[i]);
+     text_layer_destroy(daysSteps[i]);
+   }
+     text_layer_destroy(blue_bar);
+}
+/******************************************************************************************************/
 
 
 /****************Initialization, Deinitialization, and Main********************************************/
@@ -568,6 +699,12 @@ static void init() {
   window_set_window_handlers(s_last5_window, (WindowHandlers) {
     .load = last5_window_load,
     .unload = last5_window_unload,
+  });
+  //creates graph window
+  s_graph_window = window_create();
+  window_set_window_handlers(s_graph_window, (WindowHandlers) {
+    .load = graph_window_load,
+    .unload = graph_window_unload,
   });
   //window_stack_push(s_main_window, true);
   window_stack_push(s_intro_window, true);
