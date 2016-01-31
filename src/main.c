@@ -445,7 +445,7 @@ static void thanks_window_load(Window *window) {
     strftime(date, sizeof(date), "%m%d/%Y", &ts);
     APP_LOG(APP_LOG_LEVEL_INFO, "Got Date: %s", date);
   text_layer_set_text(s_thanks_text_layer, userRating);
-  text_layer_set_text(s_last5_text_layer[0], "1/3/22");
+  text_layer_set_text(s_last5_text_layer[0], date);
   //sets background color to cyan
   text_layer_set_background_color(s_thanks_text_layer, GColorCyan);
   text_layer_set_background_color(s_last5_text_layer[0], GColorCyan);
