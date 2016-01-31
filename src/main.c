@@ -583,7 +583,7 @@ static void last5_window_load(Window *window) {
     s_last5_text_layer[i] = text_layer_create(GRect(0, rectBounds, bounds.size.w, 34));
     s_mid[i] = text_layer_create(GRect(0, rectBounds + 34 - 1, bounds.size.w, 1));
     rectBounds += 34;
-
+    text_layer_set_text_alignment(day[i], GTextAlignmentCenter);
     //add text to last5
     text_layer_set_text(s_last5_text_layer[i], day[i]);
 
