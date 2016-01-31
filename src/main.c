@@ -24,6 +24,7 @@ static TextLayer *s_sleep_text_layer,                      //Text that says how 
                  *daysSleep[4],
                  *daysSteps[4],
                  *blue_bar,
+                 *white_bar,
                  *key_bar[5];
 
 static MenuLayer *s_menu_layer;                            //Menu where user rates their sleep
@@ -630,13 +631,19 @@ static void graph_window_load(Window *window) {
    layer_add_child(window_layer, text_layer_get_layer(daysSteps[i]));
  }
  blue_bar = text_layer_create(GRect(0,140, bounds.size.w, 40));
+ white_bar = text_layer_create(GRect(0, 4, bounds.size.w, 26));
+  text_layer_set_text(white_bar, sleep / activity);
+  text_layer_set_background_color(white_bar, GColorWhite);
+  text_layer_set_text_alignment(white_bar, GTextAlignmentCenter);
+
  text_layer_set_background_color(blue_bar, GColorBlue);
  //text_layer = text_layer_create(GRect(50,50, bounds.size.w,40));
  //text_layer_set_background_color(text_layer, GColorBlack);
 layer_add_child(window_layer, text_layer_get_layer(blue_bar));
+layer_add_child(window_layer, text_layer_get_layer(white_bar));
  //text_layer_set_text(blue_bar, "   ZZZ     ZZZ     zzz     ZZZ");
 for (int i = 0; i < 5; i++){
-    key_bar[i] = text_layer_create(GRect(28*i+(i-1), 27, 28, 4/*change to 3?*/));
+    key_bar[i] = text_layer_create(GRect(28*i+(i-1), 0, 28, 4/*change to 3?*/));
     text_layer_set_background_color(key_bar[i], colorSelect(5-i));
     layer_add_child(window_layer, text_layer_get_layer(key_bar[i]));
   }
@@ -672,6 +679,7 @@ static void graph_window_unload(Window *window){
      text_layer_destroy(daysSteps[i]);
    }
      text_layer_destroy(blue_bar);
+     text_layer_destroy(white_bar);
   for (int i = 0; i < 5; i++)
      text_layer_destroy(key_bar[i]);
 }
