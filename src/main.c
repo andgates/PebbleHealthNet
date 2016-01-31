@@ -585,7 +585,6 @@ static void last5_window_load(Window *window) {
     rectBounds += 34;
     text_layer_set_text_alignment(day[i], GTextAlignmentCenter);
     //add text to last5
-    text_layer_set_text(s_last5_text_layer[i], day[i]);
 
     //alternate blue/gray
     if(i%2 != 0)
