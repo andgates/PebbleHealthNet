@@ -22,7 +22,8 @@ static TextLayer *s_sleep_text_layer,                      //Text that says how 
                  *s_graph_layer,
                  *daysSleep[4],
                  *daysSteps[4],
-                 *blue_bar;
+                 *blue_bar,
+                 *white_bar;
 
 static MenuLayer *s_menu_layer;                            //Menu where user rates their sleep
                                                            //(used in s_main_window)
@@ -90,7 +91,7 @@ GColor colorSelect(int mood){
  }
 }
 
- /****************************Health Storage And Helper Functions*********************************************************/
+ /****************************Brian/Michael*********************************************************/
 
  void getHealthData() {
 
@@ -434,6 +435,9 @@ static void main_window_unload(Window *window) {
 /******************************************************************************************************/
 
 /***************************************Intro Window***************************************************/
+//Need to pass in X, where X is hours slept
+//IDEA: Use a global variable
+
 //Loads intro window
 static void intro_window_load(Window *window) {
   // Now we prepare to initialize the intro
@@ -571,15 +575,14 @@ static void last5_window_load(Window *window) {
   window_set_click_config_provider(window, last5_click_config_provider);
 
   struct healthData *a = weekData;
-  static char day[5][40];
+  static char day[5][32];
   int rectBounds = 0;
   for(int i=0; i<5; i++){
     snprintf(day[i], sizeof(day[i]),"Sleep (h): %d, Steps: %d\nMood: %d", (a[i].sleepSeconds+1800)/3600, a[i].steps, a[i].mood);
-
+    //snprintf(day[i], sizeof(day[i]),"Mood: %d, Hours Slept: %d", a[i].mood, a[i].steps);
     s_last5_text_layer[i] = text_layer_create(GRect(0, rectBounds, bounds.size.w, 34));
     s_mid[i] = text_layer_create(GRect(0, rectBounds + 34 - 1, bounds.size.w, 1));
     rectBounds += 34;
-
     //add text to last5
     text_layer_set_text(s_last5_text_layer[i], day[i]);
 
@@ -592,7 +595,7 @@ static void last5_window_load(Window *window) {
     text_layer_set_background_color(s_mid[i], GColorBlack);
 
     //centers text
-    text_layer_set_text_alignment(s_last5_text_layer[i], GTextAlignmentCenter);
+    text_layer_set_text_alignment(s_last5_text_layer[i], GTextAlignmentLeft);
     layer_add_child(window_layer, text_layer_get_layer(s_last5_text_layer[i]));
     layer_add_child(window_layer, text_layer_get_layer(s_mid[i]));
 
@@ -624,15 +627,21 @@ static void graph_window_load(Window *window) {
    layer_add_child(window_layer, text_layer_get_layer(daysSleep[i]));
    layer_add_child(window_layer, text_layer_get_layer(daysSteps[i]));
  }
+ white_bar = text_layer_create(GRect(0,0, bounds.size.w, 30));
+ text_layer_set_text(white_bar, "Sleep / Activity");
+ text_layer_set_background_color(white_bar, GColorWhite);
+ text_layer_set_text_alignment(white_bar, GTextAlignmentCenter);
  blue_bar = text_layer_create(GRect(0,140, bounds.size.w, 40));
  text_layer_set_background_color(blue_bar, GColorBlue);
  //text_layer = text_layer_create(GRect(50,50, bounds.size.w,40));
  //text_layer_set_background_color(text_layer, GColorBlack);
 layer_add_child(window_layer, text_layer_get_layer(blue_bar));
+layer_add_child(window_layer, text_layer_get_layer(white_bar));
  //text_layer_set_text(blue_bar, "   ZZZ     ZZZ     zzz     ZZZ");
 
  /*printing the string with day names*/
  //******need a fixed width font
+ //char lastFourDayNames[4][4] = {"Sun","Sat","Fri","Thu"};
  static char lastFourDayNames[4][4];
  getDayNames(lastFourDayNames);
  static char lastFourDayNamesString[30];
@@ -662,6 +671,7 @@ static void graph_window_unload(Window *window){
      text_layer_destroy(daysSteps[i]);
    }
      text_layer_destroy(blue_bar);
+     text_layer_destroy(white_bar);
 }
 /******************************************************************************************************/
 
