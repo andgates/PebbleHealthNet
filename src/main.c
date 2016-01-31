@@ -1,4 +1,5 @@
 //Sean, Peter, Michael, Brian
+//Pebble App
 #include "pebble.h"
 
 #define NUM_MENU_ICONS 6
