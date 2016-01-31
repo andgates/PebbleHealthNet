@@ -238,19 +238,25 @@ static void intro_window_load(Window *window) {
   snprintf(hoursSlept, sizeof(hoursSlept), "You slept for %d hours", 0);
   
   //Sets size of sleep text
-  s_sleep_text_layer = text_layer_create(GRect(0, 0, bounds.size.w, 200));
+  s_sleep_text_layer = text_layer_create(GRect(0, 40, bounds.size.w, 200));
+  s_mid[0] = text_layer_create(GRect(0, 33, bounds.size.w, 1));
+  s_last5_text_layer0 = text_layer_create(GRect(0, 0, bounds.size.w, 40));
   //adds text to sleep_text
   text_layer_set_text(s_sleep_text_layer, hoursSlept);
+  text_layer_set_text(s_last5_text_layer0, "1/31/2099");
   //sets background color to cyan
   text_layer_set_background_color(s_sleep_text_layer, GColorCyan);
-  //sets font color to yellow
-  text_layer_set_text_color(s_sleep_text_layer, GColorPurple);
+  text_layer_set_background_color(s_last5_text_layer0, GColorCyan);
+  text_layer_set_background_color(s_mid[0], GColorBlack);
+  //sets font color to black
+  text_layer_set_text_color(s_sleep_text_layer, GColorBlack);
+  text_layer_set_text_color(s_last5_text_layer0, GColorBlack);
   
-  //text_layer_set_size(s_sleep_text_layer, 18);
   text_layer_set_font(s_sleep_text_layer, fonts_get_system_font(FONT_KEY_DROID_SERIF_28_BOLD));
   
   //centers text
   text_layer_set_text_alignment(s_sleep_text_layer, GTextAlignmentCenter);
+  text_layer_set_text_alignment(s_last5_text_layer0, GTextAlignmentCenter);
   //don't know what this does, think we need it though
   layer_add_child(window_layer, text_layer_get_layer(s_sleep_text_layer));
   
@@ -259,7 +265,10 @@ static void intro_window_load(Window *window) {
   text_layer_set_text_alignment(z1, GTextAlignmentLeft);
   text_layer_set_font(z1, fonts_get_system_font(FONT_KEY_GOTHIC_18_BOLD));
   text_layer_set_background_color(z1, GColorCyan);
+  
   layer_add_child(window_layer, text_layer_get_layer(z1));
+  layer_add_child(window_layer, text_layer_get_layer(s_last5_text_layer0));
+  layer_add_child(window_layer, text_layer_get_layer(s_mid[0]));
 
 
 }
@@ -268,6 +277,8 @@ static void intro_window_load(Window *window) {
 static void intro_window_unload(Window *window) {
   text_layer_destroy(s_sleep_text_layer);
   text_layer_destroy(z1);
+  text_layer_destroy(s_last5_text_layer0);
+  text_layer_destroy(s_mid[0]);
 
 }
 /******************************************************************************************************/
@@ -287,25 +298,36 @@ static void thanks_window_load(Window *window) {
   snprintf(userRating, sizeof(userRating), "You rated %d ", rating);
   
   //sets size of thanks_text
-  s_thanks_text_layer = text_layer_create(GRect(0, 0, bounds.size.w, 200));
+  s_thanks_text_layer = text_layer_create(GRect(0, 40, bounds.size.w, 200));
+  s_mid[0] = text_layer_create(GRect(0, 33, bounds.size.w, 1));
+  s_last5_text_layer0 = text_layer_create(GRect(0, 0, bounds.size.w, 40));
   //adds text to thanks_text
   text_layer_set_text(s_thanks_text_layer, userRating);
+  text_layer_set_text(s_last5_text_layer0, "1/31/2099");
   //sets background color to cyan
   text_layer_set_background_color(s_thanks_text_layer, GColorCyan);
-  //sets text color to yellow
-  text_layer_set_text_color(s_thanks_text_layer, GColorPurple);
+  text_layer_set_background_color(s_last5_text_layer0, GColorCyan);
+  text_layer_set_background_color(s_mid[0], GColorBlack);
+  //sets text color to black
+  text_layer_set_text_color(s_thanks_text_layer, GColorBlack);
+  text_layer_set_text_color(s_last5_text_layer0, GColorBlack);
   //centers text
   text_layer_set_text_alignment(s_thanks_text_layer, GTextAlignmentCenter);
+  text_layer_set_text_alignment(s_last5_text_layer0, GTextAlignmentCenter);
   
   text_layer_set_font(s_thanks_text_layer, fonts_get_system_font(FONT_KEY_DROID_SERIF_28_BOLD));
   //dont know, think its important
   layer_add_child(window_layer, text_layer_get_layer(s_thanks_text_layer));
+  layer_add_child(window_layer, text_layer_get_layer(s_last5_text_layer0));
+  layer_add_child(window_layer, text_layer_get_layer(s_mid[0]));
   
 }
 
 //Unloads thanks window
 static void thanks_window_unload(Window *window) {
   text_layer_destroy(s_thanks_text_layer);
+  text_layer_destroy(s_last5_text_layer0);
+  text_layer_destroy(s_mid[0]);
 }
 /******************************************************************************************************/
 
@@ -324,6 +346,7 @@ static void last5_window_load(Window *window) {
     a[i].mood = (rand() % (5 + 1 - 1) + 1);
     a[i].hours = (rand() % (24 + 1 - 0) + 0);
   }
+  a[0].mood = rating;
   static char day1[32];
   snprintf(day1, sizeof(day1),"Mood: %d, Hours Slept: %d", a[0].mood, a[0].hours);
   static char day2[32];
@@ -363,10 +386,10 @@ static void last5_window_load(Window *window) {
   text_layer_set_text(s_last5_text_layer4, day5);
  
   //sets background color to cyan
-  text_layer_set_background_color(s_last5_text_layer0, GColorRed);
-  text_layer_set_background_color(s_last5_text_layer1, GColorOrange);
-  text_layer_set_background_color(s_last5_text_layer2, GColorYellow);
-  text_layer_set_background_color(s_last5_text_layer3, GColorGreen);
+  text_layer_set_background_color(s_last5_text_layer0, GColorBlue);
+  text_layer_set_background_color(s_last5_text_layer1, GColorLightGray);
+  text_layer_set_background_color(s_last5_text_layer2, GColorBlue);
+  text_layer_set_background_color(s_last5_text_layer3, GColorLightGray);
   text_layer_set_background_color(s_last5_text_layer4, GColorBlue);
   for(int i = 0; i < 4; i++){
   text_layer_set_background_color(s_mid[i], GColorBlack);
