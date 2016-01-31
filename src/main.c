@@ -134,26 +134,24 @@ GColor colorSelect(int mood){
 static void getDate(char* buf){
     time_t now;
     struct tm ts;
-    //char buf[11];
     ////// Get current time
     time(&now);
-    ////// Format time, "ddd yyyy-mm-dd hh:mm:ss zzz"
     ts = *localtime(&now);
     strftime(buf, sizeof(buf), "%m-%d-%Y", &ts);
     APP_LOG(APP_LOG_LEVEL_INFO, "Got Date: %s", buf);
-    //return *buf;
 }
 
-static void getDayName(char buf[4][4], time_t time){
-    //time_t now;
+//Returns the current and previous 3 days
+static void getDayNames(char buf[4][4]){
+    time_t now;
     struct tm ts;
-    //char buf[11];
-    ////// Get current time
-    //time(&time);
-    ////// Format time, "ddd yyyy-mm-dd hh:mm:ss zzz"
-    ts = *localtime(&time);
-    strftime(buf[0], sizeof(buf[0]), "%a", &ts);
-    //APP_LOG(APP_LOG_LEVEL_INFO, "Got Date: %s", buf);
+    //Get current time
+    time(&now);
+    for(int i=0; i<4; i++){
+        ts = *localtime(&now);
+        strftime(buf[i], sizeof(buf[i]), "%a", &ts);
+        now -= 86400;
+    }
 }
 
 static int getCurrentDayNumber(){
@@ -200,11 +198,12 @@ static void loadDemoData(){
     //struct sleepMood demoData[6];
     int currentDay = getCurrentDayNumber();
 
-    for(int i = 1; i < 5; i++){
+    for(int i = 0; i < 5; i++){
         weekData[i].mood = (rand() % (5 + 1 - 1) + 1);
         weekData[i].sleepSeconds = (rand() % (36000 + 1 - 0) + 0);
         weekData[i].steps = (rand() % (6000 + 1 - 0) + 0);
         persist_write_data(currentDay - (i+1), &weekData[i], sizeof(weekData[i]));
+        APP_LOG(APP_LOG_LEVEL_INFO, "Random Data: m:%d, s:%d, ste:%d",weekData[i].mood, weekData[i].sleepSeconds, weekData[i].steps);
     }
 
 
@@ -292,11 +291,12 @@ static void thanks_click_config_provider(void *context){
   window_single_click_subscribe(BUTTON_ID_DOWN, back_handler);
   //continue
   window_single_click_subscribe(BUTTON_ID_SELECT, thanks_click_handler);
+
 }
 static void last5_click_handler(ClickRecognizerRef recognizer, void *context) {
   window_stack_push(s_graph_window, true);
 }
-static void last_5_click_provider(void *context){
+static void last5_click_config_provider(void *context){
   window_single_click_subscribe(BUTTON_ID_BACK, back_handler);
   //Continue
   window_single_click_subscribe(BUTTON_ID_UP, last5_click_handler);
@@ -308,7 +308,7 @@ static void last_5_click_provider(void *context){
 static void graph_click_handler(ClickRecognizerRef recognizer, void *context){
   window_stack_pop_all(true);
 }
-static void graph_click_provider(void *context){
+static void graph_click_config_provider(void *context){
   window_single_click_subscribe(BUTTON_ID_BACK, back_handler);
   //Continue
   window_single_click_subscribe(BUTTON_ID_UP, graph_click_handler);
@@ -455,7 +455,7 @@ static void intro_window_load(Window *window) {
   s_mid[0] = text_layer_create(GRect(0, 33, bounds.size.w, 1));
   s_last5_text_layer[0] = text_layer_create(GRect(0, 0, bounds.size.w, 40));
   //adds text to sleep_text
-  static char date1[25];
+  static char date[12];
       time_t now;
     struct tm ts;
     //char buf[11];
@@ -463,10 +463,10 @@ static void intro_window_load(Window *window) {
     time(&now);
     ////// Format time, "ddd yyyy-mm-dd hh:mm:ss zzz"
     ts = *localtime(&now);
-    strftime(date1, sizeof(date1), "%m/%d/%Y", &ts);
-    APP_LOG(APP_LOG_LEVEL_INFO, "Got Date: %s", date1);
+    strftime(date, sizeof(date), "%m/%d/%Y", &ts);
+    APP_LOG(APP_LOG_LEVEL_INFO, "Got Date: %s", date);
   text_layer_set_text(s_sleep_text_layer, hoursSlept);
-  text_layer_set_text(s_last5_text_layer[0], date1);
+  text_layer_set_text(s_last5_text_layer[0], date);
   //sets background color to cyan
   text_layer_set_background_color(s_sleep_text_layer, GColorCyan);
   text_layer_set_background_color(s_last5_text_layer[0], GColorCyan);
@@ -525,7 +525,7 @@ static void thanks_window_load(Window *window) {
   s_mid[0] = text_layer_create(GRect(0, 33, bounds.size.w, 1));
   s_last5_text_layer[0] = text_layer_create(GRect(0, 0, bounds.size.w, 40));
   //adds text to thanks_text
-  static char date[25];
+  static char date[12];
       time_t now;
     struct tm ts;
     //char buf[11];
@@ -571,6 +571,8 @@ static void last5_window_load(Window *window) {
   Layer *window_layer = window_get_root_layer(window);
   GRect bounds = layer_get_bounds(window_layer);
 
+  window_set_click_config_provider(window, last5_click_config_provider);
+
   struct healthData *a = weekData;
   static char day[5][32];
   int rectBounds = 0;
@@ -614,7 +616,9 @@ static void last5_window_unload(Window *window) {
 static void graph_window_load(Window *window) {
   Layer *window_layer = window_get_root_layer(window);
   GRect bounds = layer_get_bounds(window_layer);
-  
+
+  window_set_click_config_provider(window, graph_click_config_provider);
+
   for (int i = 0; i < 4; i++){
    daysSleep[i] = text_layer_create(GRect(111-35*i, 140-11*sleepRating(weekData[i].sleepSeconds), 13, sleepRating(weekData[i].sleepSeconds)*11));
    text_layer_set_background_color(daysSleep[i], colorSelect(weekData[i].mood));
@@ -629,10 +633,12 @@ static void graph_window_load(Window *window) {
  //text_layer_set_background_color(text_layer, GColorBlack);
 layer_add_child(window_layer, text_layer_get_layer(blue_bar));
  //text_layer_set_text(blue_bar, "   ZZZ     ZZZ     zzz     ZZZ");
- 
+
  /*printing the string with day names*/
  //******need a fixed width font
- char lastFourDayNames[4][4] = {"Sun","Sat","Fri","Thu"};
+ //char lastFourDayNames[4][4] = {"Sun","Sat","Fri","Thu"};
+ static char lastFourDayNames[4][4];
+ getDayNames(lastFourDayNames);
  static char lastFourDayNamesString[30];
  for (int i = 0; i < 3; i++)
      lastFourDayNamesString[i] = ' ';
@@ -668,11 +674,11 @@ static void graph_window_unload(Window *window){
 static void init() {
     loadDemoData();
     getHealthData();
-    char day[4][4];
-    time_t now;
-    time(&now);
-    getDayName(day, now);
-    APP_LOG(APP_LOG_LEVEL_INFO, "Got Day Name: %s", day[0]);
+    //char day[4][4];
+    //time_t now;
+    //time(&now);
+    //getDayName(day, now);
+    //APP_LOG(APP_LOG_LEVEL_INFO, "Got Day Name: %s", day[0]);
   //Creates intro window
   s_intro_window = window_create();
   window_set_window_handlers(s_intro_window, (WindowHandlers){
