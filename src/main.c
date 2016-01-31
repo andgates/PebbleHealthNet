@@ -13,12 +13,8 @@ static Window *s_main_window,                              //Window where user r
 static TextLayer *s_sleep_text_layer,                      //Text that says how many hours user slept
                  *s_thanks_text_layer,                      //Thanks user for rating their sleep
                  *z1,
-                 *s_last5_text_layer0,
-                 *s_last5_text_layer1,
-                 *s_last5_text_layer2,
-                 *s_last5_text_layer3,
-                 *s_last5_text_layer4,
-                 *s_mid[4];
+                 *s_last5_text_layer[5],
+                 *s_mid[5];
 
 static MenuLayer *s_menu_layer;                            //Menu where user rates their sleep
                                                            //(used in s_main_window)
@@ -28,24 +24,22 @@ static GBitmap *s_menu_icons[NUM_MENU_ICONS];              //Images correspondin
 
 int rating = 0;                                            //Sleep rating that can be stored
 
-struct sleepMood {
+struct healthData {
 	int mood;
-	int seconds;
+	int sleepSeconds;
+	int steps;
 };
 
 // struct sleepMood a[5];
-struct sleepMood today;
-struct sleepMood weekData[5];
+struct healthData today;
+struct healthData weekData[5];
 
  /****************************Brian/Michael*********************************************************/
 
-
-
-
- void getSleepData() {
+ void getHealthData() {
 
 	// Use the sleep count metric (sleep seconds)
-	HealthMetric metric = HealthMetricStepCount;
+	HealthMetric metric = HealthMetricSleepSeconds;
 
 	// Create timestamps for now (the end time) and midnight (the start time)
 	time_t end = time(NULL);
@@ -59,11 +53,39 @@ struct sleepMood weekData[5];
 		// Data is available!
 		APP_LOG(APP_LOG_LEVEL_INFO, "Sleep seconds today: %d",
           (int)health_service_sum_today(metric));
-	today.seconds = (int)health_service_sum_today(metric);
+	today.sleepSeconds = (int)health_service_sum_today(metric);
 	} else {
 		// No data recorded yet today
 		APP_LOG(APP_LOG_LEVEL_ERROR, "Data unavailable!");
 	}
+
+
+	metric = HealthMetricStepCount;
+	mask = health_service_metric_accessible(metric,
+		start, end);
+
+	if(mask == HealthServiceAccessibilityMaskAvailable) {
+		// Data is available!
+		APP_LOG(APP_LOG_LEVEL_INFO, "Step count today: %d",
+          (int)health_service_sum_today(metric));
+	today.steps = (int)health_service_sum_today(metric);
+	} else {
+		// No data recorded yet today
+		APP_LOG(APP_LOG_LEVEL_ERROR, "Data unavailable!");
+	}
+}
+
+static void getDate(char* buf){
+    time_t now;
+    struct tm ts;
+    //char buf[11];
+    ////// Get current time
+    time(&now);
+    ////// Format time, "ddd yyyy-mm-dd hh:mm:ss zzz"
+    ts = *localtime(&now);
+    strftime(buf, sizeof(buf), "%m-%d-%Y\n", &ts);
+    APP_LOG(APP_LOG_LEVEL_INFO, "Got Date: %s", buf);
+    //return *buf;
 }
 
 static int getCurrentDayNumber(){
@@ -107,12 +129,13 @@ static void saveTodayData() {
 }
 
 static void loadDemoData(){
-    struct sleepMood demoData[6];
+    //struct sleepMood demoData[6];
     int currentDay = getCurrentDayNumber();
 
     for(int i = 1; i < 5; i++){
         weekData[i].mood = (rand() % (5 + 1 - 1) + 1);
-        weekData[i].seconds = (rand() % (36000 + 1 - 0) + 0);
+        weekData[i].sleepSeconds = (rand() % (36000 + 1 - 0) + 0);
+        weekData[i].steps = (rand() % (6000 + 1 - 0) + 0);
         persist_write_data(currentDay - (i+1), &weekData[i], sizeof(weekData[i]));
     }
 
@@ -124,7 +147,7 @@ static void readDemoData(){
 
         for(int i = 0; i < 6; i++){
         persist_read_data(currentDay - (i+1), &weekData[i], sizeof(weekData[i]));
-        APP_LOG(APP_LOG_LEVEL_INFO, "Week data %d: seconds:%d mood:%d", currentDay - (i+1), weekData[i].seconds, weekData[i].mood);
+        APP_LOG(APP_LOG_LEVEL_INFO, "Week data %d: seconds:%d mood:%d", currentDay - (i+1), weekData[i].sleepSeconds, weekData[i].mood);
     }
 }
 
@@ -339,23 +362,33 @@ static void intro_window_load(Window *window) {
   //Sets size of sleep text
   s_sleep_text_layer = text_layer_create(GRect(0, 40, bounds.size.w, 200));
   s_mid[0] = text_layer_create(GRect(0, 33, bounds.size.w, 1));
-  s_last5_text_layer0 = text_layer_create(GRect(0, 0, bounds.size.w, 40));
+  s_last5_text_layer[0] = text_layer_create(GRect(0, 0, bounds.size.w, 40));
   //adds text to sleep_text
+  char date1[25];
+      time_t now;
+    struct tm ts;
+    //char buf[11];
+    ////// Get current time
+    time(&now);
+    ////// Format time, "ddd yyyy-mm-dd hh:mm:ss zzz"
+    ts = *localtime(&now);
+    strftime(date1, sizeof(date1), "%m-%d-%Y", &ts);
+    APP_LOG(APP_LOG_LEVEL_INFO, "Got Date: %s", date1);
   text_layer_set_text(s_sleep_text_layer, hoursSlept);
-  text_layer_set_text(s_last5_text_layer0, "1/31/2099");
+  text_layer_set_text(s_last5_text_layer[0], date1);
   //sets background color to cyan
   text_layer_set_background_color(s_sleep_text_layer, GColorCyan);
-  text_layer_set_background_color(s_last5_text_layer0, GColorCyan);
+  text_layer_set_background_color(s_last5_text_layer[0], GColorCyan);
   text_layer_set_background_color(s_mid[0], GColorBlack);
   //sets font color to black
   text_layer_set_text_color(s_sleep_text_layer, GColorBlack);
-  text_layer_set_text_color(s_last5_text_layer0, GColorBlack);
+  text_layer_set_text_color(s_last5_text_layer[0], GColorBlack);
 
   text_layer_set_font(s_sleep_text_layer, fonts_get_system_font(FONT_KEY_DROID_SERIF_28_BOLD));
 
   //centers text
   text_layer_set_text_alignment(s_sleep_text_layer, GTextAlignmentCenter);
-  text_layer_set_text_alignment(s_last5_text_layer0, GTextAlignmentCenter);
+  text_layer_set_text_alignment(s_last5_text_layer[0], GTextAlignmentCenter);
   //don't know what this does, think we need it though
   layer_add_child(window_layer, text_layer_get_layer(s_sleep_text_layer));
 
@@ -366,7 +399,7 @@ static void intro_window_load(Window *window) {
   text_layer_set_background_color(z1, GColorCyan);
 
   layer_add_child(window_layer, text_layer_get_layer(z1));
-  layer_add_child(window_layer, text_layer_get_layer(s_last5_text_layer0));
+  layer_add_child(window_layer, text_layer_get_layer(s_last5_text_layer[0]));
   layer_add_child(window_layer, text_layer_get_layer(s_mid[0]));
 
 
@@ -376,7 +409,7 @@ static void intro_window_load(Window *window) {
 static void intro_window_unload(Window *window) {
   text_layer_destroy(s_sleep_text_layer);
   text_layer_destroy(z1);
-  text_layer_destroy(s_last5_text_layer0);
+  text_layer_destroy(s_last5_text_layer[0]);
   text_layer_destroy(s_mid[0]);
 
 }
@@ -399,25 +432,35 @@ static void thanks_window_load(Window *window) {
   //sets size of thanks_text
   s_thanks_text_layer = text_layer_create(GRect(0, 40, bounds.size.w, 200));
   s_mid[0] = text_layer_create(GRect(0, 33, bounds.size.w, 1));
-  s_last5_text_layer0 = text_layer_create(GRect(0, 0, bounds.size.w, 40));
+  s_last5_text_layer[0] = text_layer_create(GRect(0, 0, bounds.size.w, 40));
   //adds text to thanks_text
+  char date[25];
+      time_t now;
+    struct tm ts;
+    //char buf[11];
+    ////// Get current time
+    time(&now);
+    ////// Format time, "ddd yyyy-mm-dd hh:mm:ss zzz"
+    ts = *localtime(&now);
+    strftime(date, sizeof(date), "%m%d/%Y", &ts);
+    APP_LOG(APP_LOG_LEVEL_INFO, "Got Date: %s", date);
   text_layer_set_text(s_thanks_text_layer, userRating);
-  text_layer_set_text(s_last5_text_layer0, "1/31/2099");
+  text_layer_set_text(s_last5_text_layer[0], "1/3/22");
   //sets background color to cyan
   text_layer_set_background_color(s_thanks_text_layer, GColorCyan);
-  text_layer_set_background_color(s_last5_text_layer0, GColorCyan);
+  text_layer_set_background_color(s_last5_text_layer[0], GColorCyan);
   text_layer_set_background_color(s_mid[0], GColorBlack);
   //sets text color to black
   text_layer_set_text_color(s_thanks_text_layer, GColorBlack);
-  text_layer_set_text_color(s_last5_text_layer0, GColorBlack);
+  text_layer_set_text_color(s_last5_text_layer[0], GColorBlack);
   //centers text
   text_layer_set_text_alignment(s_thanks_text_layer, GTextAlignmentCenter);
-  text_layer_set_text_alignment(s_last5_text_layer0, GTextAlignmentCenter);
+  text_layer_set_text_alignment(s_last5_text_layer[0], GTextAlignmentCenter);
 
   text_layer_set_font(s_thanks_text_layer, fonts_get_system_font(FONT_KEY_DROID_SERIF_28_BOLD));
   //dont know, think its important
   layer_add_child(window_layer, text_layer_get_layer(s_thanks_text_layer));
-  layer_add_child(window_layer, text_layer_get_layer(s_last5_text_layer0));
+  layer_add_child(window_layer, text_layer_get_layer(s_last5_text_layer[0]));
   layer_add_child(window_layer, text_layer_get_layer(s_mid[0]));
 
 }
@@ -425,7 +468,7 @@ static void thanks_window_load(Window *window) {
 //Unloads thanks window
 static void thanks_window_unload(Window *window) {
   text_layer_destroy(s_thanks_text_layer);
-  text_layer_destroy(s_last5_text_layer0);
+  text_layer_destroy(s_last5_text_layer[0]);
   text_layer_destroy(s_mid[0]);
 }
 /******************************************************************************************************/
@@ -437,90 +480,39 @@ static void last5_window_load(Window *window) {
   Layer *window_layer = window_get_root_layer(window);
   GRect bounds = layer_get_bounds(window_layer);
 
-  //if user presses BACK, the app exits
-  //window_set_click_config_provider(window, thanks_click_config_provider);
+  struct healthData *a = weekData;
+  static char day[5][32];
+  int rectBounds = 0;
+  for(int i=0; i<5; i++){
+    snprintf(day[i], sizeof(day[i]),"Mood: %d, Hours Slept: %d", a[i].mood, a[i].sleepSeconds/3600);
+    //snprintf(day[i], sizeof(day[i]),"Mood: %d, Hours Slept: %d", a[i].mood, a[i].steps);
+    s_last5_text_layer[i] = text_layer_create(GRect(0, rectBounds, bounds.size.w, 34));
+    s_mid[i] = text_layer_create(GRect(0, rectBounds + 34 - 1, bounds.size.w, 1));
+    rectBounds += 34;
 
+    //add text to last5
+    text_layer_set_text(s_last5_text_layer[i], day[i]);
 
-  //for(int i = 0; i < 5; i++){
-  //  a[i].mood = (rand() % (5 + 1 - 1) + 1);
-  //  a[i].hours = (rand() % (24 + 1 - 0) + 0);
-  //}
-  //a[0].mood = rating;
-  struct sleepMood *a = weekData;
-  static char day1[32];
-  snprintf(day1, sizeof(day1),"Mood: %d, Hours Slept: %d", a[0].mood, a[0].seconds/3600);
-  static char day2[32];
-  snprintf(day2, sizeof(day2),"Mood: %d, Hours Slept: %d", a[1].mood, a[1].seconds/3600);
-  static char day3[32];
-  snprintf(day3, sizeof(day3),"Mood: %d, Hours Slept: %d", a[2].mood, a[2].seconds/3600);
-  static char day4[32];
-  snprintf(day4, sizeof(day4),"Mood: %d, Hours Slept: %d", a[3].mood, a[3].seconds/3600);
-  static char day5[32];
-  snprintf(day5, sizeof(day5),"Mood: %d, Hours Slept: %d", a[4].mood, a[4].seconds/3600);
+    //alternate blue/gray
+    if(i%2 != 0)
+        text_layer_set_background_color(s_last5_text_layer[i], GColorBlue);
+    else
+        text_layer_set_background_color(s_last5_text_layer[i], GColorLightGray);
 
+    text_layer_set_background_color(s_mid[i], GColorBlack);
 
+    //centers text
+    text_layer_set_text_alignment(s_last5_text_layer[i], GTextAlignmentLeft);
+    layer_add_child(window_layer, text_layer_get_layer(s_last5_text_layer[i]));
+    layer_add_child(window_layer, text_layer_get_layer(s_mid[i]));
 
-
-
-//   //converts user rating to char **FOR TESTING**
-//   static char userRating[32];
-//   snprintf(userRating, sizeof(userRating), "You rated %d ", rating);
-
-  //sets size of last5
-  s_last5_text_layer0 = text_layer_create(GRect(0, 0, bounds.size.w, 34));
-  s_mid[0] = text_layer_create(GRect(0, 33, bounds.size.w, 1));
-  s_last5_text_layer1 = text_layer_create(GRect(0, 34, bounds.size.w, 34));
-  s_mid[1] = text_layer_create(GRect(0, 67, bounds.size.w, 1));
-  s_last5_text_layer2 = text_layer_create(GRect(0, 68, bounds.size.w, 34));
-  s_mid[2] = text_layer_create(GRect(0, 101, bounds.size.w, 1));
-  s_last5_text_layer3 = text_layer_create(GRect(0, 102, bounds.size.w, 34));
-  s_mid[3] = text_layer_create(GRect(0, 135, bounds.size.w, 1));
-  s_last5_text_layer4 = text_layer_create(GRect(0, 136, bounds.size.w, 34));
-
-
-  //adds text to last5
-  text_layer_set_text(s_last5_text_layer0, day1);
-  text_layer_set_text(s_last5_text_layer1, day2);
-  text_layer_set_text(s_last5_text_layer2, day3);
-  text_layer_set_text(s_last5_text_layer3, day4);
-  text_layer_set_text(s_last5_text_layer4, day5);
-
-  //sets background color to cyan
-  text_layer_set_background_color(s_last5_text_layer0, GColorBlue);
-  text_layer_set_background_color(s_last5_text_layer1, GColorLightGray);
-  text_layer_set_background_color(s_last5_text_layer2, GColorBlue);
-  text_layer_set_background_color(s_last5_text_layer3, GColorLightGray);
-  text_layer_set_background_color(s_last5_text_layer4, GColorBlue);
-  for(int i = 0; i < 4; i++){
-  text_layer_set_background_color(s_mid[i], GColorBlack);
-  }
-
-  //centers text
-  text_layer_set_text_alignment(s_last5_text_layer0, GTextAlignmentLeft);
-  text_layer_set_text_alignment(s_last5_text_layer1, GTextAlignmentLeft);
-  text_layer_set_text_alignment(s_last5_text_layer2, GTextAlignmentLeft);
-  text_layer_set_text_alignment(s_last5_text_layer3, GTextAlignmentLeft);
-  text_layer_set_text_alignment(s_last5_text_layer4, GTextAlignmentLeft);
-
-  //dont know, think its important
-  layer_add_child(window_layer, text_layer_get_layer(s_last5_text_layer0));
-  layer_add_child(window_layer, text_layer_get_layer(s_last5_text_layer1));
-  layer_add_child(window_layer, text_layer_get_layer(s_last5_text_layer2));
-  layer_add_child(window_layer, text_layer_get_layer(s_last5_text_layer3));
-  layer_add_child(window_layer, text_layer_get_layer(s_last5_text_layer4));
-  for(int i = 0; i < 4; i++){
-  layer_add_child(window_layer, text_layer_get_layer(s_mid[i]));
   }
 }
 
 //Unloads last5 window
 static void last5_window_unload(Window *window) {
-    text_layer_destroy(s_last5_text_layer0);
-    text_layer_destroy(s_last5_text_layer1);
-    text_layer_destroy(s_last5_text_layer2);
-    text_layer_destroy(s_last5_text_layer3);
-    text_layer_destroy(s_last5_text_layer4);
   for(int i = 0; i < 4; i++){
+    text_layer_destroy(s_last5_text_layer[i]);
     text_layer_destroy(s_mid[i]);
   }
 }
@@ -531,6 +523,7 @@ static void last5_window_unload(Window *window) {
 /****************Initialization, Deinitialization, and Main********************************************/
 static void init() {
     loadDemoData();
+    getHealthData();
   //Creates intro window
   s_intro_window = window_create();
   window_set_window_handlers(s_intro_window, (WindowHandlers){
