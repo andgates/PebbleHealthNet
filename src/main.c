@@ -1,4 +1,4 @@
-#Sean, Peter, Michael, Brian
+//Sean, Peter, Michael, Brian
 #include "pebble.h"
 
 #define NUM_MENU_ICONS 6
