@@ -580,7 +580,10 @@ static void last5_window_load(Window *window) {
   static char day[5][40];
   int rectBounds = 0;
   for(int i=0; i<5; i++){
-    snprintf(day[i], sizeof(day[i]),"Sleep (h): %d, Steps: %d\nMood: %d", (a[i].sleepSeconds+1800)/3600, a[i].steps, a[i].mood);
+    if(a[i].mood == -1)
+        snprintf(day[i], sizeof(day[i]),"Sleep (h): %d, Steps: %d\nMood: n/a", (a[i].sleepSeconds+1800)/3600, a[i].steps);
+    else
+        snprintf(day[i], sizeof(day[i]),"Sleep (h): %d, Steps: %d\nMood: %d", (a[i].sleepSeconds+1800)/3600, a[i].steps, a[i].mood);
 
     s_last5_text_layer[i] = text_layer_create(GRect(0, rectBounds, bounds.size.w, 34));
     s_mid[i] = text_layer_create(GRect(0, rectBounds + 34 - 1, bounds.size.w, 1));
