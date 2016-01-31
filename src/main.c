@@ -23,7 +23,8 @@ static TextLayer *s_sleep_text_layer,                      //Text that says how 
                  *s_graph_layer,
                  *daysSleep[4],
                  *daysSteps[4],
-                 *blue_bar;
+                 *blue_bar,
+                 *key_bar[5];
 
 static MenuLayer *s_menu_layer;                            //Menu where user rates their sleep
                                                            //(used in s_main_window)
@@ -516,8 +517,11 @@ static void thanks_window_load(Window *window) {
 
   //converts user rating to char **FOR TESTING**
   static char userRating[32];
-  snprintf(userRating, sizeof(userRating), "You rated %d ", rating);
-
+  if (rating == -1)
+    snprintf(userRating, sizeof(userRating), "You rated n/a ");
+  else
+    snprintf(userRating, sizeof(userRating), "You rated %d ", rating);
+  
   //sets size of thanks_text
   s_thanks_text_layer = text_layer_create(GRect(0, 40, bounds.size.w, 200));
   s_mid[0] = text_layer_create(GRect(0, 33, bounds.size.w, 1));
@@ -631,6 +635,11 @@ static void graph_window_load(Window *window) {
  //text_layer_set_background_color(text_layer, GColorBlack);
 layer_add_child(window_layer, text_layer_get_layer(blue_bar));
  //text_layer_set_text(blue_bar, "   ZZZ     ZZZ     zzz     ZZZ");
+for (int i = 0; i < 5; i++){
+    key_bar[i] = text_layer_create(GRect(28*i+(i-1), 27, 28, 4/*change to 3?*/));
+    text_layer_set_background_color(key_bar[i], colorSelect(5-i));
+    layer_add_child(window_layer, text_layer_get_layer(key_bar[i]));
+  }
 
  /*printing the string with day names*/
  //******need a fixed width font
@@ -663,6 +672,8 @@ static void graph_window_unload(Window *window){
      text_layer_destroy(daysSteps[i]);
    }
      text_layer_destroy(blue_bar);
+  for (int i = 0; i < 5; i++)
+     text_layer_destroy(key_bar[i]);
 }
 /******************************************************************************************************/
 
