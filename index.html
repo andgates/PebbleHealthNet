@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset='utf-8'>
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+
+    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/github-dark.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/print.css" media="print">
+
+    <title>PebbleHealthNet by andgates</title>
+  </head>
+
+  <body>
+
+    <header>
+      <div class="container">
+        <h1>PebbleHealthNet</h1>
+        <h2>Health Analytics and Mood Tracking using the Pebble Health API</h2>
+
+        <section id="downloads">
+          <a href="https://github.com/andgates/PebbleHealthNet/zipball/master" class="btn">Download as .zip</a>
+          <a href="https://github.com/andgates/PebbleHealthNet/tarball/master" class="btn">Download as .tar.gz</a>
+          <a href="https://github.com/andgates/PebbleHealthNet" class="btn btn-github"><span class="icon"></span>View on GitHub</a>
+        </section>
+      </div>
+    </header>
+
+    <div class="container">
+      <section id="main_content">
+        <h1>
+<a id="pebblehealthnet" class="anchor" href="#pebblehealthnet" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>PebbleHealthNet</h1>
+
+<h2>
+<a id="hack-ucsc-2016" class="anchor" href="#hack-ucsc-2016" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a><a href="http://www.hackucsc.com/">Hack UCSC</a> 2016</h2>
+
+<p>Best pebble hack!</p>
+
+<h4>
+<a id="view-the-devpost-for-this-project" class="anchor" href="#view-the-devpost-for-this-project" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>View the DevPost for this project.</h4>
+
+<p>Originally built in 36 hours at Hack UCSC '16 with a team of four CS and CE undergraduates.</p>
+
+<h2>
+<a id="what-it-does" class="anchor" href="#what-it-does" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>What it Does</h2>
+
+<p>HealthNet is a health analytics watchapp built using the <a href="https://developer.getpebble.com/guides/pebble-apps/sensors/health/">Pebble Health API</a>.
+HealthNet is a tool for users to monitor their sleep, physical activity, and mood, and see correlations between the three.</p>
+
+<p>HealthNet prompts users for their daily mood and then displays sleep and physical activity data integrated graphically with data about the user's mood, so that users can quickly see their recent amounts of sleep and activity and make connections with what amount of activity and sleep causes their mood to be highest.</p>
+
+<h2>
+<a id="can-i-try-it-out" class="anchor" href="#can-i-try-it-out" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Can I try it out?</h2>
+
+<p>Currently, you can't get HealthNet on your pebble. It requires <a href="https://developer.getpebble.com/sdk/changelogs/3.9-beta7/">Pebble SDK 3.9-beta7</a>. Once the Pebble Health API is out of beta, we plan to publish HealthNet.</p>
+
+<h2>
+<a id="inspiration" class="anchor" href="#inspiration" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Inspiration</h2>
+
+<p>The Pebble Health app was released at the end of last year but the API is still in beta. So we decided to get in the hackathon spirit and really hack something together to get the ball rolling on development with the Pebble Health API.
+The Pebble Health application is great at tracking your steps and sleep, but that’s about all it does at this point. We set out to make a health analytics application that gives users insights on the data Pebble has been gathering for them.</p>
+
+<h2>
+<a id="planned-improvements" class="anchor" href="#planned-improvements" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Planned Improvements</h2>
+
+<p>1) We plan on adding timeline support. Our eventual goal for HealthNet is for it to offer insights throughout the day. For example, we’d love to correlate activity (step count) and sleep and send timeline notifications to the user when there are relevant insights. We'll develop an algorithm that relates a user's mood to their activity and sleep level, and we'll let the user know what conditions have them feeling best. We'll also recommend getting more sleep and being more active when our algorithm detects that a lack of one might cause them to have a worse mood. 
+Examples of timeline notifications:
+"You sleep 17% better on days when you've been more active than average."
+"You sleep best when you to go to bed before 12am. Why not try it out tonight and see how you feel tomorrow?"</p>
+
+<p>2) Expanding the graph and statistics page to display more data. We'll change the statistics page to a menu that a user can scroll through to see additional days as well as 7-, 14-, and 30-day averages with the activity, amount of sleep, and mood of the user. We'll change the graph page so that the user can also load different days and composites of time periods, rather than just the last four days.</p>
+
+<h2>
+<a id="how-we-built-it" class="anchor" href="#how-we-built-it" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>How we built it</h2>
+
+<p>Currently, you can only use the Pebble Health API with the beta Pebble SDK. HealthNet is written in C and uses only the Pebble SDK.</p>
+
+<h2>
+<a id="challenges-we-ran-into" class="anchor" href="#challenges-we-ran-into" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Challenges We ran into</h2>
+
+<p>For three out of the four on our team, this was our first time using C, so there was that. Two on our team had experience using PebbleJS but PebbleC was a whole new beast before the begining of this 36 hour code binge. Sean and I recieved runner up for best Pebble Hack at HackingEDU 2015. We wrote an arithmetic game called <a href="http://devpost.com/software/hackingedu-project">DailEQs</a> with PebbleJS and CloudPebble.
+We ran into some challenges because we weren’t able to use the beta Pebble SDK with CloudPebble. This meant all of our testing had to be done on an offline emulator that was quite buggy.
+Testing our application on an actual Pebble Smartwatch was another challenge. Pebble releases the beta SDK publicly but does not release the beta firmware. We had to contact Katherine Berry at Pebble in order to get an unsigned firmware update.</p>
+
+<h2>
+<a id="about-us" class="anchor" href="#about-us" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>About Us</h2>
+
+<p>We’re three third year transfer students at UCSC and one freshmen at UCSB.
+Sean Dougher gets into Dougher mode, where he stays up all night programming; we wouldn’t have an application without him. Brian put the team on his back with his expertise in C and debugging skills. Peter took charge of the tedious task of hacking the UI with Sean and writing the code that generates graphs. Michael brought the Linux so we could use the beta Pebble SDK (he also risked blowing up his Pebble Time by installing a sketchy unsigned firmware update sent via Slack). </p>
+      </section>
+    </div>
+
+              <script type="text/javascript">
+            var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+            document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+          </script>
+          <script type="text/javascript">
+            try {
+              var pageTracker = _gat._getTracker("UA-20206782-4");
+            pageTracker._trackPageview();
+            } catch(err) {}
+          </script>
+
+  </body>
+</html>
