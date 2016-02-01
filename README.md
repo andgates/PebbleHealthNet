@@ -1,6 +1,6 @@
 # PebbleHealthNet
 
-##Hack UCSC 2016
+##[Hack UCSC](http://www.hackucsc.com/) 2016
 Best pebble hack!
 
 ##What it Does
@@ -10,10 +10,10 @@ HealthNet is a tool for users to monitor their sleep, physical activity, and moo
 HealthNet prompts users for their daily mood and then displays sleep and physical activity data integrated graphically with data about the user's mood, so that users can quickly see their recent amounts of sleep and activity and make connections with what amount of activity and sleep causes their mood to be highest.
 
 ##Can I try it out?
-Currently, you can't get HealthNet on your pebble. It requires [Pebble SDK 3.9-beta7](https://developer.getpebble.com/sdk/changelogs/3.9-beta7/). 
+Currently, you can't get HealthNet on your pebble. It requires [Pebble SDK 3.9-beta7](https://developer.getpebble.com/sdk/changelogs/3.9-beta7/). Once the Pebble Health API is out of beta, we plan to publish HealthNet.
 
 ##Inspiration
-The Pebble Health app was released at the end of last year but the API is still in beta. So we decided to get in the hackathon spirit and do some real hacking.
+The Pebble Health app was released at the end of last year but the API is still in beta. So we decided to get in the hackathon spirit and really hack something together to get the ball rolling on development with the Pebble Health API.
 The Pebble Health application is great at tracking your steps and sleep, but that’s about all it does at this point. We set out to make a health analytics application that gives users insights on the data Pebble has been gathering for them.
 ##Planned Improvements
 1) We plan on adding timeline support. Our eventual goal for HealthNet is for it to offer insights throughout the day. For example, we’d love to correlate activity (step count) and sleep and send timeline notifications to the user when there are relevant insights. We'll develop an algorithm that relates a user's mood to their activity and sleep level, and we'll let the user know what conditions have them feeling best. We'll also recommend getting more sleep and being more active when our algorithm detects that a lack of one might cause them to have a worse mood. 
@@ -26,10 +26,10 @@ Examples of timeline notifications:
 ## How we built it
 Currently, you can only use the Pebble Health API with the beta Pebble SDK. HealthNet is written in C and uses only the Pebble SDK.
 
-## Challenges I ran into
+## Challenges We ran into
+For three out of the four on our team, this was our first time using C, so there was that. Two on our team had experience using PebbleJS but PebbleC was a whole new beast before the begining of this 36 hour code binge. Sean and I recieved runner up for best Pebble Hack at HackingEDU 2015. We wrote an arithmetic game called [DailEQs](http://devpost.com/software/hackingedu-project) with PebbleJS and CloudPebble.
 We ran into some challenges because we weren’t able to use the beta Pebble SDK with CloudPebble. This meant all of our testing had to be done on an offline emulator that was quite buggy.
 Testing our application on an actual Pebble Smartwatch was another challenge. Pebble releases the beta SDK publicly but does not release the beta firmware. We had to contact Katherine Berry at Pebble in order to get an unsigned firmware update.
-Oh yeah, for three out of four on our team, this was our first time using C.
 
 ##About Us
 We’re three third year transfer students at UCSC and one freshmen at UCSB.
