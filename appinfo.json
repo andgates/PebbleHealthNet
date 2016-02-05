@@ -1,9 +1,10 @@
 {
     "appKeys": {},
     "capabilities": [
-        ""
+        "health"
     ],
-    "companyName": "hi.imsean@yahoo.com",
+    "companyName": "bnichols@gmail.com",
+    "enableMultiJS": false,
     "longName": "HealthNET",
     "projectType": "native",
     "resources": {
@@ -48,6 +49,10 @@
     },
     "sdkVersion": "3",
     "shortName": "HealthNET",
+    "targetPlatforms": [
+        "aplite",
+        "basalt"
+    ],
     "uuid": "7273f7b5-887d-41ee-a319-66d604447314",
     "versionLabel": "1.0",
     "watchapp": {

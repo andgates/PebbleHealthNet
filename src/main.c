@@ -192,7 +192,7 @@ static int getCurrentDayNumber(){
 static void saveTodayData() {
     int currentDay = getCurrentDayNumber();
     APP_LOG(APP_LOG_LEVEL_INFO, "Current Day: %d", currentDay);
-	persist_write_data(currentDay, &today, sizeof(today));
+	//persist_write_data(currentDay, &today, sizeof(today));
     weekData[0] = today;
 	//saveDateDataToStorage(currentDay, &today, sizeof(today));
 }
@@ -205,7 +205,7 @@ static void loadDemoData(){
         weekData[i].mood = (rand() % (5 + 1 - 1) + 1);
         weekData[i].sleepSeconds = (rand() % (36000 + 1 - 0) + 0);
         weekData[i].steps = (rand() % (6000 + 1 - 0) + 0);
-        persist_write_data(currentDay - (i+1), &weekData[i], sizeof(weekData[i]));
+        //persist_write_data(currentDay - (i+1), &weekData[i], sizeof(weekData[i]));
         APP_LOG(APP_LOG_LEVEL_INFO, "Random Data: m:%d, s:%d, ste:%d",weekData[i].mood, weekData[i].sleepSeconds, weekData[i].steps);
     }
 
@@ -216,7 +216,7 @@ static void readDemoData(){
     int currentDay = getCurrentDayNumber();
 
         for(int i = 0; i < 6; i++){
-        persist_read_data(currentDay - (i+1), &weekData[i], sizeof(weekData[i]));
+        //persist_read_data(currentDay - (i+1), &weekData[i], sizeof(weekData[i]));
         APP_LOG(APP_LOG_LEVEL_INFO, "Week data %d: seconds:%d mood:%d", currentDay - (i+1), weekData[i].sleepSeconds, weekData[i].mood);
     }
 }
